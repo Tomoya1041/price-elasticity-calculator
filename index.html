@@ -4,93 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>価格弾力性計算機</title>
-    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .card { background: #f4f4f4; border-radius: 5px; padding: 20px; margin-bottom: 20px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; }
         input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
         .result { font-weight: bold; margin-top: 10px; }
+        #chart-container { width: 100%; max-width: 600px; margin: 20px auto; }
+        .patterns-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .pattern-card {
+            flex: 1;
+            min-width: 300px;
+            margin: 0 10px 20px;
+        }
+        @media (max-width: 768px) {
+            .pattern-card {
+                flex: 100%;
+                margin: 0 0 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const PriceElasticityCalculator = () => {
-            const [pattern1, setPattern1] = React.useState({ price: '', profitMargin: '', salesVolume: '' });
-            const [pattern2, setPattern2] = React.useState({ price: '', profitMargin: '', salesVolume: '' });
-
-            const calculateProfit = (pattern) => {
-                const price = parseFloat(pattern.price);
-                const profitMargin = parseFloat(pattern.profitMargin) / 100;
-                const salesVolume = parseFloat(pattern.salesVolume);
-                
-                if (isNaN(price) || isNaN(profitMargin) || isNaN(salesVolume)) {
-                    return '入力を確認してください';
-                }
-                
-                return (price * profitMargin * salesVolume).toFixed(2);
-            };
-
-            const handleInputChange = (pattern, field, value) => {
-                if (pattern === 'pattern1') {
-                    setPattern1({ ...pattern1, [field]: value });
-                } else {
-                    setPattern2({ ...pattern2, [field]: value });
-                }
-            };
-
-            return (
-                <div className="container">
-                    <h1>価格弾力性計算機</h1>
-                    {['pattern1', 'pattern2'].map((pattern, index) => (
-                        <div key={pattern} className="card">
-                            <h2>パターン {index + 1}</h2>
-                            <div className="input-group">
-                                <label htmlFor={`${pattern}-price`}>販売価格</label>
-                                <input
-                                    id={`${pattern}-price`}
-                                    type="number"
-                                    value={pattern === 'pattern1' ? pattern1.price : pattern2.price}
-                                    onChange={(e) => handleInputChange(pattern, 'price', e.target.value)}
-                                    placeholder="販売価格を入力"
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label htmlFor={`${pattern}-profitMargin`}>利益率 (%)</label>
-                                <input
-                                    id={`${pattern}-profitMargin`}
-                                    type="number"
-                                    value={pattern === 'pattern1' ? pattern1.profitMargin : pattern2.profitMargin}
-                                    onChange={(e) => handleInputChange(pattern, 'profitMargin', e.target.value)}
-                                    placeholder="利益率を入力"
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label htmlFor={`${pattern}-salesVolume`}>販売個数</label>
-                                <input
-                                    id={`${pattern}-salesVolume`}
-                                    type="number"
-                                    value={pattern === 'pattern1' ? pattern1.salesVolume : pattern2.salesVolume}
-                                    onChange={(e) => handleInputChange(pattern, 'salesVolume', e.target.value)}
-                                    placeholder="販売個数を入力"
-                                />
-                            </div>
-                            <div className="result">
-                                <strong>利益額: </strong>
-                                {pattern === 'pattern1' ? calculateProfit(pattern1) : calculateProfit(pattern2)}
-                            </div>
-                        </div>
-                    ))}
+    <div class="container">
+        <h1>価格弾力性計算機</h1>
+        <div class="patterns-container">
+            <div id="pattern1" class="card pattern-card">
+                <h2>パターン 1</h2>
+                <div class="input-group">
+                    <label for="price1">販売価格</label>
+                    <input id="price1" type="number" placeholder="販売価格を入力">
                 </div>
-            );
-        };
-
-        ReactDOM.render(<PriceElasticityCalculator />, document.getElementById('root'));
-    </script>
+                <div class="input-group">
+                    <label for="profitMargin1">利益率 (%)</label>
+                    <input id="profitMargin1" type="number" placeholder="利益率を入力">
+                </div>
+                <div class="input-group">
+                    <label for="salesVolume1">販売個数</label>
+                    <input id="salesVolume1" type="number" placeholder="販売個数を入力">
+                </div>
+                <div class="result">
+                    <strong>利益額: </strong><span id="profit1">0</span>
+                </div>
+            </div>
+            <div id="pattern2" class="card pattern-card">
+                <h2>パターン 2</h2>
+                <div class="input-group">
+                    <label for="price2">販売価格</label>
+                    <input id="price2" type="number" placeholder="販売価格を入力">
+                </div>
+                <div class="input-group">
+                    <label for="profitMargin2">利益率 (%)</label>
+                    <input id="profitMargin2" type="number" placeholder="利益率を入力">
+                </div>
+                <div class="input-group">
+                    <label for="salesVolume2">販売個数</label>
+                    <input id="salesVolume2" type="number" placeholder="販売個数を入力">
+                </div>
+                <div class="result">
+                    <strong>利益額: </strong><span id="profit2">0</span>
+                </div>
+            </div>
+        </div>
+        <div id="comparison" class="card">
+            <h2>利益額の比較</h2>
+            <p>パターン1の利益: <span id="compareProfit1">0</span></p>
+            <p>パターン2の利益: <span id="compareProfit2">0</span></p>
+            <p>差額: <span id="profitDifference">0</span></p>
+            <div id="chart-container">
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
